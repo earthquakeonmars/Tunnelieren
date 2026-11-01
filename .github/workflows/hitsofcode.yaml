@@ -16,16 +16,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clear Hits-of-Code cache
+        # yamllint disable rule:line-length
         run: |
           curl --fail --silent --show-error \
             --request POST \
-            # yamllint disable-line rule:line-length
             'https://hitsofcode.com/github/earthquakeonmars/ssh-tunnel/delete?exclude=' \
             --output /dev/null
+        # yamllint enable rule:line-length
 
       - name: Trigger Hits-of-Code rebuild
+        # yamllint disable rule:line-length
         run: |
           curl --fail --silent --show-error \
-            # yamllint disable-line rule:line-length
             'https://hitsofcode.com/github/earthquakeonmars/ssh-tunnel/json?exclude=' \
             --output /dev/null
+        # yamllint enable rule:line-length
