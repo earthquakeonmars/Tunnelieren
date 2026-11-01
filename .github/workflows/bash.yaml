@@ -1,0 +1,70 @@
+---
+# cspell:words shellcheck shfmt mapfile norc
+name: Bash
+
+'on':
+  push:
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  shellcheck:
+    name: ShellCheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Install ShellCheck and shfmt
+        run: >-
+          python3 -m pip install
+          shellcheck-py==0.11.0.1 shfmt-py==4.2.0
+
+      - name: Check shell scripts
+        env:
+          SHELLCHECK_OPTS: ''
+        run: |
+          shfmt -f=0 . > "$RUNNER_TEMP/shell-files"
+          mapfile -d '' -t files < "$RUNNER_TEMP/shell-files"
+
+          if (( ${#files[@]} == 0 )); then
+            echo "No shell scripts to check."
+            exit 0
+          fi
+
+          shellcheck --shell=bash --severity=style --enable=all \
+            --norc --extended-analysis=true \
+            --external-sources --check-sourced -- "${files[@]}"
+
+  shfmt:
+    name: Check shell formatting
+    needs: shellcheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Install shfmt
+        run: python3 -m pip install shfmt-py==4.2.0
+
+      - name: Format shell scripts and check for changes
+        run: |
+          shfmt -f=0 . > "$RUNNER_TEMP/shell-files"
+          mapfile -d '' -t files < "$RUNNER_TEMP/shell-files"
+
+          if (( ${#files[@]} == 0 )); then
+            echo "No shell scripts to format."
+            exit 0
+          fi
+
+          shfmt -i 4 -ci -w -ln bash -- "${files[@]}"
+          git diff --exit-code
