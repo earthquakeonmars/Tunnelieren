@@ -1,4 +1,5 @@
 ---
+# cspell:words hitsofcode
 name: hitsofcode
 
 'on':
@@ -18,11 +19,13 @@ jobs:
         run: |
           curl --fail --silent --show-error \
             --request POST \
+            # yamllint disable-line rule:line-length
             'https://hitsofcode.com/github/earthquakeonmars/ssh-tunnel/delete?exclude=' \
             --output /dev/null
 
       - name: Trigger Hits-of-Code rebuild
         run: |
           curl --fail --silent --show-error \
+            # yamllint disable-line rule:line-length
             'https://hitsofcode.com/github/earthquakeonmars/ssh-tunnel/json?exclude=' \
             --output /dev/null
