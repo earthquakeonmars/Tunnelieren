@@ -1,0 +1,29 @@
+---
+name: cspell
+
+'on': push
+
+permissions:
+  contents: read
+
+jobs:
+  cspell:
+    name: Check spelling
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Check spelling
+        uses: streetsidesoftware/cspell-action@v9.2.0
+        with:
+          config: cspell.yaml
+          files: |
+            **
+            !**/.git/**
+          incremental_files_only: false
+          check_dot_files: true
+          strict: true
+          inline: error
+          suggestions: true
