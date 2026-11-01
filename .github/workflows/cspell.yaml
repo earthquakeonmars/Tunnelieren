@@ -1,7 +1,12 @@
 ---
+# cspell:words mktemp
 name: cspell
 
-'on': push
+'on':
+  push:
+  pull_request:
+    branches: [master]
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: read
@@ -24,6 +29,54 @@ jobs:
             !**/.git/**
           incremental_files_only: false
           check_dot_files: true
+          strict: true
+          inline: error
+          suggestions: true
+
+  cspell_commits:
+    name: Check commit messages
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Extract commit messages
+        id: commit_messages
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          messages_dir=$(mktemp -d "$RUNNER_TEMP/cspell-commits.XXXXXX")
+          git rev-list --reverse "$BASE_SHA..$HEAD_SHA" -- \
+            > "$messages_dir/commits"
+
+          if [[ ! -s "$messages_dir/commits" ]]; then
+            echo "No commit messages to check."
+            echo "has_commits=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          while IFS= read -r commit; do
+            git show --no-patch --format=%B "$commit" -- \
+              > "$messages_dir/$commit.txt"
+          done < "$messages_dir/commits"
+
+          echo "has_commits=true" >> "$GITHUB_OUTPUT"
+          echo "directory=$messages_dir" >> "$GITHUB_OUTPUT"
+
+      - name: Check commit messages
+        if: steps.commit_messages.outputs.has_commits == 'true'
+        uses: streetsidesoftware/cspell-action@v9.2.0
+        with:
+          root: ${{ steps.commit_messages.outputs.directory }}
+          files: '*.txt'
+          config: ${{ github.workspace }}/cspell.yaml
+          incremental_files_only: false
           strict: true
           inline: error
           suggestions: true
