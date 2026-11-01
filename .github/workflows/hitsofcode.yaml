@@ -1,0 +1,33 @@
+---
+# cspell:words hitsofcode
+name: hitsofcode
+
+'on':
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  rebuild_cache:
+    name: Rebuild Hits-of-Code cache
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clear Hits-of-Code cache
+        # yamllint disable rule:line-length
+        run: |
+          curl --fail --silent --show-error \
+            --request POST \
+            'https://hitsofcode.com/github/earthquakeonmars/ssh-tunnel/delete?exclude=' \
+            --output /dev/null
+        # yamllint enable rule:line-length
+
+      - name: Trigger Hits-of-Code rebuild
+        # yamllint disable rule:line-length
+        run: |
+          curl --fail --silent --show-error \
+            'https://hitsofcode.com/github/earthquakeonmars/ssh-tunnel/json?exclude=' \
+            --output /dev/null
+        # yamllint enable rule:line-length
