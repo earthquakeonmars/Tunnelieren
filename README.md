@@ -2,3 +2,4 @@
 [![Hits-of-Code](https://hitsofcode.com/github/earthquakeonmars/ssh-tunnel?exclude=)](https://hitsofcode.com/github/earthquakeonmars/ssh-tunnel/view?exclude=)
 [![cspell](https://github.com/earthquakeonmars/ssh-tunnel/actions/workflows/cspell.yaml/badge.svg)](https://github.com/earthquakeonmars/ssh-tunnel/actions/workflows/cspell.yaml)
 [![GitHub Last Commit](https://img.shields.io/github/last-commit/earthquakeonmars/Tunnelieren)](https://github.com/earthquakeonmars/Tunnelieren/commits/)
+[![CodeFactor](https://www.codefactor.io/repository/github/earthquakeonmars/tunnelieren/badge)](https://www.codefactor.io/repository/github/earthquakeonmars/tunnelieren)
